@@ -1,0 +1,30 @@
+{
+  "name": "where-to-go",
+  "version": "1.0.0",
+  "description": "Help you decide where to go!",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [],
+  "author": "Andrew Nguyen",
+  "license": "ISC",
+  "dependencies": {
+    "@material-ui/core": "^4.8.3",
+    "@material-ui/icons": "^4.5.1",
+    "@material-ui/lab": "^4.0.0-alpha.39",
+    "@types/autosuggest-highlight": "^3.1.0",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.1.6",
+    "@types/react": "^16.9.17",
+    "autosuggest-highlight": "^3.1.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.15",
+    "next": "^9.1.7",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "swr": "^0.1.16",
+    "typescript": "^3.7.4"
+  }
+}
