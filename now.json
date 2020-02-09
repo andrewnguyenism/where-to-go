@@ -1,0 +1,6 @@
+{
+  "env": {
+    "FOURSQUARE_CLIENT_ID": "@foursquare-client-id",
+    "FOURSQUARE_CLIENT_SECRET": "@foursquare-client-secret"
+  }
+}

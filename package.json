@@ -30,6 +30,6 @@
     "typescript": "^3.7.4"
   },
   "devDependencies": {
-    "now": "^16.7.3"
+    "now": "^17.0.3"
   }
 }
