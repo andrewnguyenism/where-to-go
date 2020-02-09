@@ -95,17 +95,23 @@ const RollingLoader = ({ entrants, size = 24 }: RollingLoaderProps) => {
   }
 
   React.useEffect(() => {
+    let timeout : NodeJS.Timeout;
     const interval = setInterval(() => {
       setFadeOutFlag(true);
       setFadeInFlag(true);
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         setFadeOutFlag(false);
         setFadeInFlag(false);
         setAlternateFlag(prevFlag => !prevFlag);
         setCurrentIndex(prevIndex => getNextIndex(prevIndex));
       }, fadeDuration);
     }, 500);
-    return () => clearInterval(interval);
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      clearInterval(interval);
+    };
   }, []);
 
   const currentEmoji = entrants[currentIndex];
@@ -136,6 +142,7 @@ const RollingLoader = ({ entrants, size = 24 }: RollingLoaderProps) => {
         div.viewport {
           height: ${size * 2.5}px;
           overflow: hidden;
+          min-width: 300px;
           position: relative;
           text-align: center;
           width: 100%;

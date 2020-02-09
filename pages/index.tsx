@@ -2,22 +2,12 @@ import * as React from "react";
 
 import Head from "next/head";
 
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Container,
-  CssBaseline,
-  Grid,
-  Typography,
-  CardHeader
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Stars as StarsIcon } from "@material-ui/icons";
+import { Button, Container, CssBaseline } from "@material-ui/core";
 
+import PastResults from "../src/components/PastResults";
 import RollingLoader from "../src/components/RollingLoader";
+import VenueCard from "../src/components/VenueCard";
+import { emojisToRoll } from "../src/constants";
 import * as Foursquare from "../src/services/foursquare";
 
 export default function Index() {
@@ -37,7 +27,7 @@ export default function Index() {
   const [resultHistory, setResultHistory] = React.useState<
     Foursquare.BaseVenue[]
   >([]);
-  const [remainingTries, setRemainingTries] = React.useState(4);
+  const [remainingRerolls, setRemainingRerolls] = React.useState(4);
   const [error, setError] = React.useState<string | null>(null);
 
   const findAPlace = async (givenPosition: Position) => {
@@ -57,7 +47,7 @@ export default function Index() {
     );
   };
 
-  const handleRollDiceClick = async (event: any) => {
+  const handleRollDiceClick = async () => {
     setFetchingResult(true);
     setGettingPosition(true);
     const geo = navigator.geolocation;
@@ -100,7 +90,11 @@ export default function Index() {
           setFilteredPlaces(
             placesToUse.filter(place => randomPlace.id !== place.id)
           );
-          setRemainingTries(remainingTries - 1);
+          setRemainingRerolls(
+            places.length < remainingRerolls
+              ? places.length - 1
+              : remainingRerolls - 1
+          );
           setResultHistory([randomPlace, ...resultHistory]);
         }
       };
@@ -112,9 +106,8 @@ export default function Index() {
     setFetchingResult(false);
   }, [basicResult, detailedResult]);
 
-  const classes = useStyles();
   return (
-    <div className="container">
+    <Container>
       <Head>
         <title>Where To Go</title>
         <meta
@@ -136,102 +129,25 @@ export default function Index() {
         </Button>
       ) : null}
       {fetchingResult ? (
-        <RollingLoader
-          entrants={[
-            "🥨",
-            "🥯",
-            "🥞",
-            "🍗",
-            "🥩",
-            "🍔",
-            "🍟",
-            "🍕",
-            "🌭",
-            "🥪",
-            "🌮",
-            "🌯",
-            "🍳",
-            "🥘",
-            "🍲",
-            "🥗",
-            "🍛",
-            "🍜",
-            "🍝",
-            "🍣",
-            "🥟",
-            "🥡",
-            "🍦",
-            "🍩",
-            "🍷",
-            "🍻",
-            "🥤"
-          ]}
-          size={48}
-        />
+        <RollingLoader entrants={emojisToRoll} size={48} />
       ) : null}
-      {detailedResult || basicResult ? (
-        <Container>
-          <Card className={classes.card}>
-            {detailedResult && detailedResult.bestPhoto ? (
-              <CardMedia
-                className={classes.cardImage}
-                component="img"
-                height="1024"
-                image={`${detailedResult.bestPhoto.prefix}1024x1024${detailedResult.bestPhoto.suffix}`}
-              />
-            ) : null}
-            <CardContent>
-              <Typography gutterBottom variant="h5">
-                {(basicResult ? basicResult : detailedResult ? detailedResult : {}).name}
-              </Typography>
-              {detailedResult ? (
-                <Typography gutterBottom variant="caption">
-                  {detailedResult.rating
-                    ? `${detailedResult.rating}/10${
-                        detailedResult.ratingSignals
-                          ? ` (${detailedResult.ratingSignals})`
-                          : ""
-                      }`
-                    : undefined}
-                </Typography>
-              ) : null}
-              <Typography gutterBottom color="textSecondary" variant="body2">
-                {(basicResult ? basicResult : detailedResult ? detailedResult : {}).categories?.find(category => category.primary)?.name}
-              </Typography>
-              <Typography variant="body1">
-                {(basicResult ? basicResult : detailedResult ? detailedResult : {}).location?.formattedAddress.join(", ")}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              {detailedResult ? (
-                <Button
-                  size="small"
-                  color="primary"
-                  href={detailedResult.canonicalUrl}
-                >
-                  View Details
-                </Button>
-              ) : null}
-              <Button
-                size="small"
-                disabled={remainingTries < 1}
-                color="primary"
-                onClick={handleRollDiceClick}
-              >
-                Roll Again {remainingTries > 0 ? `(${remainingTries})` : ""}
-              </Button>
-            </CardActions>
-          </Card>
+      {basicResult !== undefined || detailedResult !== undefined ? (
+        <>
+          <VenueCard
+            basicInfo={basicResult}
+            canReroll={remainingRerolls > 0}
+            detailedInfo={detailedResult}
+            onClickReroll={handleRollDiceClick}
+            rerollLabel={`Roll Again ${
+              remainingRerolls > 0 ? `(${remainingRerolls})` : ""
+            }`}
+          />
           {resultHistory.length > 1 ? (
-            <Typography className={classes.history} variant="body2">
-              Past Results:{" "}
-              {resultHistory
-                .slice(1)
-                .map(result => result.name)
-                .join(", ")}
-            </Typography>
+            <PastResults results={resultHistory
+              .slice(1)
+              .map(result => result.name)} />
           ) : null}
-        </Container>
+        </>
       ) : null}
       <style global>{`
         body,html {
@@ -242,22 +158,7 @@ export default function Index() {
           display: flex;
           justify-content: center;
         }
-        div.container {
-          width: 100%;
-        }
       `}</style>
-    </div>
+    </Container>
   );
 }
-
-const useStyles = makeStyles(theme => ({
-  card: {
-    marginTop: theme.spacing(2)
-  },
-  cardImage: {
-    height: 250
-  },
-  history: {
-    marginTop: theme.spacing(2)
-  }
-}));
