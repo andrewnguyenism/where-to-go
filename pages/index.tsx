@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import axios from "axios";
 import Head from "next/head";
 
 import { Button, Container, CssBaseline } from "@material-ui/core";
@@ -31,15 +32,13 @@ export default function Index() {
   const [error, setError] = React.useState<string | null>(null);
 
   const findAPlace = async (givenPosition: Position) => {
-    const data = await Foursquare.venues.explore({
-      limit: 50,
-      ll: `${(position || givenPosition).coords.latitude},${
-        (position || givenPosition).coords.longitude
-      }`,
-      openNow: true,
-      radius: 1500,
-      section: "food"
+    const {data} = await axios.get('/api/places-near-me', {
+      params: {
+        latitude: (position || givenPosition).coords.latitude,
+        longitude: (position || givenPosition).coords.longitude,
+      },
     });
+    console.log(data);
     setPlaces(
       data.groups[0].items.map(
         (item: { venue: Foursquare.BaseVenue }) => item.venue
@@ -78,10 +77,9 @@ export default function Index() {
         undetailedVenue: Foursquare.BaseVenue
       ) => {
         try {
-          const detailedVenue = await Foursquare.venues.details(
-            undetailedVenue.id
-          );
-          setDetailedResult(detailedVenue.venue);
+          const {data} = await axios.get(`/api/place-details/${undetailedVenue.id}`);
+          console.log(data);
+          setDetailedResult(data.venue);
         } catch (error) {
           setBasicResult(undetailedVenue);
           setDetailedResult(undefined);
