@@ -22,7 +22,7 @@
     "@types/react": "^16.9.17",
     "autosuggest-highlight": "^3.1.1",
     "axios": "^0.19.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "next": "^9.3.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
